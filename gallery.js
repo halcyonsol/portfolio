@@ -42,7 +42,7 @@ function resize(){
  const pageWidth=w*.76,pageHeight=h*.94;
  panels.forEach(p=>{
   p.style.width=pageWidth+'px';p.style.height=pageHeight+'px';
-  const bow=pageHeight*.035;
+  const bow=pageHeight*.035;p.style.setProperty('--curve-inset',bow+'px');
   p.querySelector('.screen').style.clipPath=`path("M 0 0 Q ${pageWidth/2} ${bow*2} ${pageWidth} 0 L ${pageWidth} ${pageHeight} Q ${pageWidth/2} ${pageHeight-bow*2} 0 ${pageHeight} Z")`;
  });draw();
 }
