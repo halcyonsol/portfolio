@@ -12,3 +12,14 @@ body.project-fullscreen .panel{display:none}
 body.project-fullscreen .panel.expanded{display:block;visibility:visible!important;inset:0;width:100%!important;height:100%!important;transform:none!important}
 body.project-fullscreen .screen{inset:0;border:0;border-radius:0;box-shadow:none}
 body.project-fullscreen .screen:after{display:none}
+
+/* Rotate around the horizontal axis: projects travel above and below the viewer. */
+.screen{border-radius:3.5% / 50%}
+.edge{left:0;right:0;width:100%;min-width:0;height:42px;min-height:0;flex-direction:row;gap:12px}
+.edge.top{top:0;bottom:auto;background:linear-gradient(180deg,#151811aa,transparent)}
+.edge.bottom{bottom:0;top:auto;background:linear-gradient(0deg,#151811aa,transparent)}
+.edge small{writing-mode:horizontal-tb}
+.ceiling,.floor{top:-30%;bottom:auto;left:auto;width:180px;height:160%}
+.ceiling{left:-130px}.floor{right:-135px}
+.position{left:12px;bottom:7px}
+@media(max-width:700px){.edge{height:38px}.position{left:4px;bottom:4px;width:52px}.position svg{width:44px}}
