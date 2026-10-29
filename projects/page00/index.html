@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>The House With Many Views</title>
+	<style>
+		:root {
+			--ink: #1d2925;
+			--paper: #f5f0e5;
+			--sage: #9caf92;
+			--moss: #536858;
+			--clay: #bd7051;
+			--sun: #e5b84e;
+			--line: rgba(29, 41, 37, .22);
+		}
+
+		* { box-sizing: border-box; }
+		html { scroll-behavior: smooth; }
+		body {
+			margin: 0;
+			color: var(--ink);
+			background: var(--paper);
+			font-family: Georgia, 'Times New Roman', serif;
+			overflow-x: hidden;
+		}
+
+		a { color: inherit; }
+		.view { display: none; min-height: 100vh; padding: 32px 6vw 56px; }
+		.view:target { display: block; animation: arrive .55s ease both; }
+		#front { display: block; }
+		body:has(.view:target) #front:not(:target) { display: none; }
+		#front:target ~ #inside,
+		#front:target ~ #north,
+		#front:target ~ #east,
+		#front:target ~ #south,
+		#front:target ~ #west { display: none; }
+
+		.topline { display: flex; justify-content: space-between; gap: 24px; align-items: center; font: 700 11px/1.2 Arial, sans-serif; letter-spacing: .14em; text-transform: uppercase; }
+		.eyebrow { color: var(--moss); }
+		.page-count { color: var(--clay); }
+		.hero-copy { max-width: 650px; margin: 13vh auto 13vh; text-align: center; }
+		h1, h2 { margin: 0; font-weight: 400; letter-spacing: -.035em; }
+		h1 { font-size: clamp(54px, 9vw, 132px); line-height: .84; }
+		h2 { font-size: clamp(46px, 8vw, 104px); line-height: .9; }
+		.hero-copy p, .wall-copy p { font-size: 18px; line-height: 1.45; max-width: 450px; margin: 28px auto 0; }
+		.house-front { position: relative; max-width: 900px; height: 370px; margin: 0 auto; border-bottom: 8px solid var(--ink); background: #faf9f5; overflow: visible; transform: perspective(1100px) rotateY(-8deg) rotateX(2deg); transform-origin: center bottom; transform-style: preserve-3d; box-shadow: 34px 28px 0 -7px rgba(29, 41, 37, .22); }
+		.house-front::before { content: ''; position: absolute; z-index: 2; top: -40%; left: 0; width: 100%; height: 40%; background: #bd5149; clip-path: polygon(0 100%, 50% 0, 100% 100%); transform: translateZ(18px); filter: drop-shadow(0 5px 0 rgba(29, 41, 37, .25)); }
+		.house-front::after { content: ''; position: absolute; z-index: 0; left: 7%; right: 7%; bottom: 0; height: 13%; background: #c5c3bc; transform: translateZ(-24px) translateX(20px); }
+		.house-side { position: absolute; z-index: 0; top: 7%; right: 0; width: 10%; height: 86%; background: #d7d5cf; clip-path: polygon(0 0, 100% 8%, 100% 100%, 0 100%); transform: translateZ(-18px) skewY(-3deg); }
+		.window { position: absolute; z-index: 3; top: 40%; width: 106px; height: 76px; border: 7px solid var(--ink); background: #d9e2d1; transform: translateZ(28px); box-shadow: 8px 8px 0 rgba(29, 41, 37, .2); }
+		.window::after { content: ''; position: absolute; top: 0; bottom: 0; left: 45%; border-left: 5px solid var(--ink); }
+		.window.left { left: 21%; }
+		.window.right { right: 21%; }
+		.door { position: absolute; z-index: 4; bottom: 0; left: 50%; width: 112px; height: 210px; transform: translateX(-50%) translateZ(35px); display: grid; place-items: center; background: var(--clay); border: 7px solid var(--ink); color: var(--paper); text-decoration: none; font: 700 12px Arial, sans-serif; letter-spacing: .12em; text-transform: uppercase; transition: background .2s, transform .2s; }
+		.door:hover { background: var(--ink); transform: translateX(-50%) translateY(-7px) translateZ(35px); }
+		.door::after { content: ''; position: absolute; right: 14px; top: 53%; width: 8px; height: 8px; border-radius: 50%; background: var(--sun); }
+		.footer-note { max-width: 900px; margin: 18px auto 0; display: flex; justify-content: space-between; font: 12px Arial, sans-serif; color: var(--moss); }
+
+		.inside-view { max-width: 1120px; margin: 7vh auto 0; }
+		.inside-stage { position: relative; height: min(60vw, 580px); min-height: 380px; margin-top: 42px; background: #e7e6e1; border: 3px solid var(--ink); overflow: hidden; perspective: 900px; }
+		.inside-stage::before { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, #fbfbf9 0 57%, #e1e0db 57% 100%); }
+		.wall { position: absolute; z-index: 2; display: flex; flex-direction: column; justify-content: space-between; align-items: center; padding: 32px; text-decoration: none; font: 700 12px Arial, sans-serif; letter-spacing: .12em; text-transform: uppercase; filter: drop-shadow(0 0 1px rgba(29, 41, 37, .3)); transition: filter .2s, transform .2s; }
+		.wall:hover { filter: brightness(1.08); transform: scale(1.015); }
+		.wall span { position: relative; z-index: 3; border: 2px solid var(--ink); padding: 9px 12px; background: rgba(255, 255, 255, .88); color: var(--ink); }
+		.wall.north { top: 0; left: 20%; right: 20%; height: 61%; background: #fff; clip-path: polygon(0 0, 100% 0, 88% 100%, 12% 100%); color: var(--ink); }
+		.wall.west { left: 0; top: 0; bottom: 40%; width: 32%; background: #e6e6e2; clip-path: polygon(0 0, 100% 33%, 100% 100%, 0 100%); color: var(--ink); }
+		.wall.east { right: 0; top: 0; bottom: 40%; width: 32%; background: #ddddda; clip-path: polygon(0 33%, 100% 0, 100% 100%, 0 100%); color: var(--ink); }
+		.wall.west, .wall.east { justify-content: flex-end; gap: 12px; padding-bottom: 18px; }
+		.floor { position: absolute; z-index: 1; left: 0; right: 0; bottom: 0; height: 40%; background: #cecdc8; clip-path: polygon(32% 0, 68% 0, 100% 100%, 0 100%); }
+		.exit-link { display: inline-block; margin-top: 24px; font: 700 12px Arial, sans-serif; letter-spacing: .12em; text-transform: uppercase; text-decoration: none; border-bottom: 2px solid var(--clay); padding-bottom: 5px; }
+
+		.wall-view { max-width: 1120px; margin: 15vh auto 0; }
+		.wall-copy { max-width: 650px; }
+		.wall-copy p { margin: 25px 0 0; }
+		.wall-art { height: min(39vw, 390px); min-height: 280px; margin-top: 48px; border: 3px solid var(--ink); position: relative; overflow: hidden; background: var(--wall-color); }
+		.wall-art::before { content: ''; position: absolute; inset: 0; background: var(--wall-color); }
+		.wall-art::after { content: ''; position: absolute; z-index: 1; left: 0; right: 0; bottom: 0; height: 20%; background: #cecdc8; border-top: 3px solid rgba(29, 41, 37, .28); }
+		.wall-window { position: absolute; z-index: 2; top: 16%; left: 50%; width: min(30%, 180px); min-width: 112px; height: 46%; min-height: 120px; transform: translateX(-50%); border: 10px solid var(--ink); background: #dce8e6; box-shadow: inset 0 0 0 3px rgba(255, 255, 255, .7), 12px 12px 0 rgba(29, 41, 37, .16); }
+		.wall-window::before { content: ''; position: absolute; top: 0; bottom: 0; left: 50%; border-left: 6px solid var(--ink); transform: translateX(-50%); }
+		.wall-window::after { content: ''; position: absolute; left: 0; right: 0; top: 50%; border-top: 6px solid var(--ink); transform: translateY(-50%); }
+		.wall-view[data-wall="north"] .wall-art { --wall-color: #fff; }
+		.wall-view[data-wall="east"] .wall-art { --wall-color: #e9e9e6; }
+		.wall-view[data-wall="south"] .wall-art { --wall-color: #deddd8; }
+		.wall-view[data-wall="west"] .wall-art { --wall-color: #f0f0ed; }
+		.wall-nav { display: flex; flex-wrap: wrap; gap: 22px; margin-top: 25px; font: 700 12px Arial, sans-serif; letter-spacing: .1em; text-transform: uppercase; }
+		.wall-nav a { text-decoration: none; border-bottom: 2px solid var(--ink); padding-bottom: 4px; }
+
+		@keyframes arrive { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+		@media (max-width: 650px) { .view { padding: 22px 5vw 42px; } .hero-copy { margin-top: 11vh; } .house-front { height: 300px; } .window { width: 70px; height: 54px; border-width: 5px; } .window.left { left: 11%; } .window.right { right: 11%; } .door { width: 90px; height: 170px; border-width: 5px; font-size: 10px; } .inside-stage { min-height: 330px; } .wall { padding: 18px 8px; } .wall span { padding: 7px 5px; font-size: 9px; } .wall-view { margin-top: 12vh; } }
+	</style>
+</head>
+<body>
+	<main>
+		<section class="view" id="front" aria-labelledby="front-title">
+			<div class="topline"><span class="eyebrow">A small house study</span><span class="page-count">01 / front</span></div>
+			<div class="hero-copy">
+				<h1 id="front-title">Come on in.</h1>
+				<p>Every side of this house is a different room waiting to be seen.</p>
+			</div>
+			<div class="house-front" aria-label="Illustration of the front of a house">
+				<div class="house-side" aria-hidden="true"></div>
+				<div class="window left"></div><div class="window right"></div>
+				<a class="door" href="#inside" aria-label="Enter the house">Enter<br>the house</a>
+			</div>
+			<div class="footer-note"><span>Front elevation</span><span>Click the door</span></div>
+		</section>
+
+		<section class="view" id="inside" aria-labelledby="inside-title">
+			<div class="topline"><span class="eyebrow">The threshold</span><span class="page-count">02 / inside</span></div>
+			<div class="inside-view">
+				<h2 id="inside-title">Inside, facing the corner.</h2>
+				<div class="inside-stage" aria-label="Three walls viewed from inside the house">
+					<a class="wall north" href="#north"><span>North wall</span><span>View full wall</span></a>
+					<a class="wall west" href="#west"><span>West wall</span><span>View full wall</span></a>
+					<a class="wall east" href="#east"><span>East wall</span><span>View full wall</span></a>
+					<div class="floor"></div>
+				</div>
+				<a class="exit-link" href="#front">Return to the front of the house</a>
+			</div>
+		</section>
+
+		<section class="view wall-view" id="north" data-wall="north" aria-labelledby="north-title">
+			<div class="topline"><span class="eyebrow">Full wall study</span><span class="page-count">03 / north</span></div>
+			<div class="wall-copy"><h2 id="north-title">The north wall.</h2><p>A quiet, blank wall seen straight on from inside the room.</p></div>
+			<div class="wall-art" aria-label="Interior view of the north wall"><div class="wall-window" aria-label="Window"></div></div>
+			<nav class="wall-nav" aria-label="House navigation"><a href="#inside">Back inside</a><a href="#front">Front of house</a><a href="#east">East wall</a><a href="#south">South wall</a><a href="#west">West wall</a></nav>
+		</section>
+
+		<section class="view wall-view" id="east" data-wall="east" aria-labelledby="east-title">
+			<div class="topline"><span class="eyebrow">Full wall study</span><span class="page-count">04 / east</span></div>
+			<div class="wall-copy"><h2 id="east-title">The east wall.</h2><p>A softly shaded interior wall, viewed directly from the room.</p></div>
+			<div class="wall-art" aria-label="Interior view of the east wall"><div class="wall-window" aria-label="Window"></div></div>
+			<nav class="wall-nav" aria-label="House navigation"><a href="#inside">Back inside</a><a href="#front">Front of house</a><a href="#north">North wall</a><a href="#south">South wall</a><a href="#west">West wall</a></nav>
+		</section>
+
+		<section class="view wall-view" id="south" data-wall="south" aria-labelledby="south-title">
+			<div class="topline"><span class="eyebrow">Full wall study</span><span class="page-count">05 / south</span></div>
+			<div class="wall-copy"><h2 id="south-title">The south wall.</h2><p>A pale interior wall meeting the floor at a simple, clear edge.</p></div>
+			<div class="wall-art" aria-label="Interior view of the south wall"><div class="wall-window" aria-label="Window"></div></div>
+			<nav class="wall-nav" aria-label="House navigation"><a href="#inside">Back inside</a><a href="#front">Front of house</a><a href="#north">North wall</a><a href="#east">East wall</a><a href="#west">West wall</a></nav>
+		</section>
+
+		<section class="view wall-view" id="west" data-wall="west" aria-labelledby="west-title">
+			<div class="topline"><span class="eyebrow">Full wall study</span><span class="page-count">06 / west</span></div>
+			<div class="wall-copy"><h2 id="west-title">The west wall.</h2><p>A softly lit interior wall, viewed directly from the room.</p></div>
+			<div class="wall-art" aria-label="Interior view of the west wall"><div class="wall-window" aria-label="Window"></div></div>
+			<nav class="wall-nav" aria-label="House navigation"><a href="#inside">Back inside</a><a href="#front">Front of house</a><a href="#north">North wall</a><a href="#east">East wall</a><a href="#south">South wall</a></nav>
+		</section>
+	</main>
+</body>
+</html>

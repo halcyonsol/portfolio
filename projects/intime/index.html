@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#050505">
+    <meta name="description" content="TIMELINE. Navigate a world where time is currency.">
+    <title>TIMELINE — Radial version</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+  </head>
+
+  <body>
+    <header class="site-header">
+      <a class="brand" href="#home" aria-label="Timeline home">TIME<span>LINE</span><i></i></a>
+      <span class="header-coordinate">TEMPORAL NETWORK / 0042</span>
+      <span class="session"><i></i> SESSION ACTIVE</span>
+    </header>
+
+    <main>
+      <!-- The hub is a scaled coordinate system: clock, orbits, and controls share it. -->
+      <section id="home" class="view home-view" aria-label="Time navigation">
+        <div class="home-caption"><span class="eyebrow">PERSONAL TIME / JAMIE MORGAN</span><p id="welcome-message"></p></div>
+
+        <div class="dome">
+          <svg class="orbit-map" viewBox="0 0 800 800" preserveAspectRatio="none" fill="none" aria-hidden="true">
+            <g class="orbit orbit-one"><ellipse cx="400" cy="400" rx="330" ry="124" stroke="currentColor"/><circle cx="730" cy="400" r="4" fill="currentColor"/></g>
+            <g class="orbit orbit-two"><ellipse cx="400" cy="400" rx="320" ry="156" stroke="currentColor"/><circle cx="80" cy="400" r="3" fill="currentColor"/></g>
+            <g class="orbit orbit-three"><ellipse cx="400" cy="400" rx="292" ry="184" stroke="currentColor"/><circle cx="400" cy="584" r="3" fill="currentColor"/></g>
+          </svg>
+
+          <a href="#bank" class="direction north" aria-label="Time bank: borrow, project, and repay">
+            <svg class="direction-arrow" viewBox="0 0 120 64" aria-hidden="true"><path d="M60 6 L112 57 L8 57 Z"/></svg><span class="direction-name">TIME BANK</span>
+          </a>
+          <a href="#transfers" class="direction east" aria-label="Transfers: send time to a contact">
+            <svg class="direction-arrow" viewBox="0 0 120 64" aria-hidden="true"><path d="M60 6 L112 57 L8 57 Z"/></svg><span class="direction-name">TRANSFER</span>
+          </a>
+          <a href="#market" class="direction south" aria-label="Marketplace: buy goods and services">
+            <span class="direction-name">MARKETPLACE</span><svg class="direction-arrow" viewBox="0 0 120 64" aria-hidden="true"><path d="M60 6 L112 57 L8 57 Z"/></svg>
+          </a>
+          <a href="#account" class="direction west" aria-label="Account: status, help, and settings">
+            <svg class="direction-arrow" viewBox="0 0 120 64" aria-hidden="true"><path d="M60 6 L112 57 L8 57 Z"/></svg><span class="direction-name">ACCOUNT</span>
+          </a>
+
+          <a class="time-core" href="#history" aria-label="View your time history">
+            
+            <span id="countdown" class="countdown" role="timer" aria-live="off"></span>
+            <span class="core-action">TIME HISTORY <span aria-hidden="true">↗</span></span>
+          </a>
+        </div>
+        
+      </section>
+
+      <!-- Menu screens share the same live account; navigation does not reload it. -->
+      <section id="workspace" class="view workspace" hidden>
+        <div class="workspace-top"><a class="back-link" href="#home">← RETURN TO ORBIT</a><a href="#history" class="mini-clock" id="screen-time" aria-label="Remaining time; view history"></a></div>
+        <nav class="screen-nav" aria-label="Directional menus">
+          <a href="#bank" data-screen="bank">↑ <span>Credit</span></a>
+          <a href="#transfers" data-screen="transfers">→ <span>Transfer</span></a>
+          <a href="#market" data-screen="market">↓ <span>Exchange</span></a>
+          <a href="#gamble" data-screen="gamble">◇ <span>Chance</span></a>
+          <a href="#account" data-screen="account">← <span>Identity</span></a>
+          <a href="#history" data-screen="history">◎ <span>Record</span></a>
+        </nav>
+        <div class="screen-heading"><div><span class="eyebrow" id="screen-index"></span><h1 id="screen-title" tabindex="-1"></h1></div></div>
+
+        <section id="bank-panel" class="panel" hidden>
+          <div class="split-grid">
+            <form id="loan-form" class="form-block">
+              <h2>Borrow a little tomorrow.</h2>
+              <label for="loan-amount">Lifespan to borrow <output id="loan-label">5 years</output></label>
+              <input id="loan-amount" type="range" min="1" max="15" value="5">
+              <div class="range-labels"><span>1 year</span><span>15 years</span></div>
+              <label for="loan-term">Repayment period</label>
+              <select id="loan-term"><option value="12">12 months / 10% interest</option><option value="24" selected>24 months / 15% interest</option><option value="60">60 months / 25% interest</option></select>
+              <button type="submit" class="primary-button">Review loan <span>↗</span></button>
+              
+            </form>
+            <div class="projection-block">
+              <div class="projection-orbit" aria-hidden="true">
+                <svg viewBox="0 0 300 300" fill="none"><circle cx="150" cy="150" r="132" class="dial-track"/><circle cx="150" cy="150" r="132" class="dial-value" id="loan-dial" pathLength="100"/><circle cx="150" cy="150" r="112" class="dial-ticks"/><path d="M150 6V28M150 272V294M6 150H28M272 150H294"/></svg>
+                <div><span id="dial-years">+5</span><small>YEARS ADVANCED</small></div>
+              </div>
+              <span class="eyebrow">LIFESPAN PROJECTION</span><dl id="projection-data" class="data-list"></dl></div>
+          </div>
+          <div class="repay-block"><div><span class="eyebrow">YOUR COMMITMENTS</span><h2>Outstanding debt</h2><p id="debt-value" class="data-number"></p></div><form id="repay-form"><label for="repay-amount">Repayment in days</label><div class="inline-fields"><input type="number" id="repay-amount" min="0.01" step="0.01" placeholder="30" required><button class="outline-button" type="submit">Review ↗</button></div><button type="button" class="text-button" id="repay-all">Repay full balance</button></form></div>
+          
+        </section>
+
+        <section id="transfers-panel" class="panel" hidden>
+          <div class="split-grid"><form id="transfer-form" class="form-block"><label for="recipient">Recipient</label><select id="recipient"><option value="alex">Alex Morgan</option><option value="sam">Sam Chen</option><option value="jordan">Jordan Ellis</option></select><label for="transfer-amount">Time to send</label><div class="inline-fields"><input id="transfer-amount" type="number" min="0.01" step="0.01" placeholder="1" required><select id="transfer-unit" aria-label="Time unit"><option value="d">Days</option><option value="h">Hours</option><option value="mo">Months</option><option value="y">Years</option></select></div><div class="fee-line"><span>Transfer fee</span><span>0 seconds</span></div><button class="primary-button" type="submit">Review transfer <span>↗</span></button></form><div class="transfer-copy">
+              <span class="eyebrow">BIOLOGICAL RELAY / DIRECT LINK</span>
+              <div class="relay-diagram" aria-hidden="true"><span class="relay-source">0042</span><div class="relay-path"><i></i><i></i><i></i></div><span class="relay-target">↗</span></div>
+              <h2>A part of you.<br>Somewhere else.</h2>
+              
+            </div></div>
+        </section>
+
+        <section id="market-panel" class="panel" hidden><p class="market-caption">ESSENTIALS / INDULGENCES <span>ALL PRICES IN LIFESPAN</span></p><div id="products" class="product-list"></div>
+          <a class="chance-link" href="#gamble"><span><small>CHANCE EXCHANGE / 05</small>Feeling lucky with your lifetime?</span><span>Enter →</span></a></section>
+
+        <section id="gamble-panel" class="panel" hidden>
+          <div class="split-grid">
+            <form id="gamble-form" class="form-block">
+              <h2>Spin for tomorrow.</h2>
+              <label for="wager-amount">Lifespan to wager</label>
+              <div class="inline-fields">
+                <input id="wager-amount" type="number" min="0.01" step="0.01" value="1" required>
+                <select id="wager-unit" aria-label="Wager time unit"><option value="h">Hours</option><option value="d">Days</option><option value="mo">Months</option><option value="y">Years</option></select>
+              </div>
+              <button class="primary-button" type="submit">Review wager <span>◇</span></button>
+              
+              
+            </form>
+            <div class="chance-instrument">
+              <span class="eyebrow">PROBABILITY ENGINE / 7 : 7 : 1</span>
+              <div class="chance-wheel" aria-hidden="true"><span class="wheel-pointer"></span><div id="wheel-disc" class="wheel-disc"></div><span class="wheel-hub">7 / 7 / 1</span></div>
+              <p id="gamble-result" role="status">Your next second is undecided.</p>
+              <a href="#history" class="text-button">View your time history ↗</a>
+            </div>
+          </div>
+        </section>
+
+        <section id="account-panel" class="panel" hidden>
+          <div class="identity-heading"><span class="identity-mark" aria-hidden="true">JM</span><div><span class="eyebrow">REGISTERED BIOLOGICAL IDENTITY</span><h2>Jamie Morgan</h2></div><span class="identity-code">0042 / VERIFIED</span></div>
+          <dl id="account-data" class="account-data"></dl>
+          <details class="guide"><summary>Navigation guide <span>+</span></summary><div class="guide-grid"><p><strong>↑ Time bank</strong>Borrow, project future lifespan, or repay debt.</p><p><strong>→ Transfer</strong>Choose a contact and send time.</p><p><strong>↓ Marketplace</strong>Browse goods and review purchases.</p><p><strong>◇ Chance</strong>Wager time on a spinning wheel. Review the odds, then confirm.</p><p><strong>← Account</strong>Check your status and session information.</p><p><strong>Center time</strong>View and filter your transaction history.</p><p><strong>Confirm / cancel</strong>Every transaction is reviewed before it changes your time.</p></div></details>
+          <details class="guide"><summary>About this world <span>+</span></summary><p>A speculative banking prototype. No real transactions. One year equals 365 days; one month equals 30 days. Your remaining lifespan is not protected by federal insurance.</p><p>Refreshing starts a new account with 42 years, no debt, and a fresh history. Time continues to tick during this visit.</p></details>
+          <div class="account-actions"><button class="outline-button" id="reset-session">Start a new session ↗</button><a class="text-button" href="terminal/index.html" target="_blank" rel="noopener">Terminal version ↗</a><a class="text-button" href="lifeline/index.html" target="_blank" rel="noopener">White snapshot ↗</a></div>
+        </section>
+
+        <section id="history-panel" class="panel" hidden><div class="filters" role="group" aria-label="History filters"><button data-filter="all" aria-pressed="true">All activity</button><button data-filter="income" aria-pressed="false">Time received</button><button data-filter="expenses" aria-pressed="false">Time spent</button><button data-filter="loans" aria-pressed="false">Loans</button><button data-filter="gambling" aria-pressed="false">Wagers</button></div><div id="history-list"></div></section>
+      </section>
+    </main>
+
+    <footer class="site-footer"><span>TIME IS CURRENCY.</span><span>SIMULATION / REFRESH TO BEGIN AGAIN</span><span class="footer-coordinate">TML—2089</span></footer>
+    <div id="notice" role="status" hidden></div>
+
+    <dialog id="review-dialog" aria-labelledby="review-title">
+      <form method="dialog"><button class="dialog-close" value="cancel" aria-label="Close review">×</button><span class="eyebrow">A MOMENT TO CONSIDER</span><h2 id="review-title"></h2><pre id="review-description"></pre><div class="dialog-actions"><button class="outline-button" value="cancel">Cancel</button><button class="primary-button" value="confirm">Confirm ↗</button></div></form>
+    </dialog>
+  </body>
+</html>

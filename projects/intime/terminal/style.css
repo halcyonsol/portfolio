@@ -1,0 +1,220 @@
+:root {
+  color-scheme: dark;
+  --text: #ffffff;
+  --bright: #ffffff;
+  --muted: #ffffff;
+  font: 15px/1.8 ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;
+  background: #000;
+  color: var(--text);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: #000;
+  overflow: hidden;
+}
+
+.terminal {
+  position: fixed;
+  top: var(--viewport-top, 0px);
+  left: 4%;
+  width: 92%;
+  height: var(--viewport-height, 100dvh);
+  display: flex;
+  flex-direction: column;
+  padding-top: clamp(16px, 4vh, 64px);
+  padding-bottom: max(12px, env(safe-area-inset-bottom));
+}
+
+.clock-header {
+  flex: 0 0 auto;
+  padding: .4em 0 1.2em;
+  background: #000;
+}
+
+/* Plain clock numerals with aligned unit labels underneath. */
+
+.nixie-clock {
+  display: flex;
+  align-items: flex-start;
+  color: #ffffff;
+  font-size: inherit;
+  font-family: inherit;
+  font-variant-numeric: tabular-nums;
+  font-weight: 400;
+  white-space: nowrap;
+  line-height: 1.2;
+
+}
+
+.clock-part {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.clock-number {
+  display: block;
+  min-width: 2ch;
+  text-align: center;
+  min-height: 1.2em;
+}
+
+.clock-unit, .clock-separator small {
+  display: block;
+  margin-top: .7em;
+  font: inherit;
+  line-height: 1.5;
+  color: var(--muted);
+
+}
+
+.clock-separator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 1ch;
+}
+
+.clock-separator > span {
+  line-height: 1.2;
+}
+
+.output-area {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #666666 #000;
+  padding-right: 8px;
+}
+
+.transcript:empty {
+  display: none;
+}
+
+.introduction {
+  margin: 0 0 1.5em;
+  min-height: 1.8em;
+  white-space: normal;
+  max-width: 65ch;
+  color: var(--text);
+}
+
+#intro-text {
+  white-space: pre-wrap;
+}
+
+.entry {
+  margin: 0 0 1.5em;
+  overflow-wrap: anywhere;
+}
+
+.echo {
+  margin: 0 0 .4em;
+  color: var(--muted);
+  white-space: pre-wrap;
+}
+
+.output {
+  margin: 0;
+  color: var(--text);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font: inherit;
+}
+
+.output.error {
+  color: var(--bright);
+}
+
+.command-line {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: baseline;
+  gap: .8em;
+  margin: .5em 0 0;
+  background: #000;
+}
+
+.command-line label {
+  color: var(--bright);
+}
+
+.command-line input {
+  flex: 1;
+  min-width: 0;
+  min-height: max(44px, 2.8em);
+  padding: .5em 0;
+  font: inherit;
+  color: var(--text);
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  outline: none;
+  caret-color: var(--bright);
+}
+
+.command-line input::placeholder {
+  color: var(--muted);
+  opacity: 1;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media(max-width:600px) {
+  .clock-header {
+    padding: 8px 0 20px;
+  }
+
+}
+
+@media(max-height:450px) {
+  .terminal {
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+
+  .clock-header {
+    padding: 4px 0 12px;
+  }
+
+}
+
+@media(prefers-reduced-motion:reduce) {
+  * {
+    scroll-behavior: auto !important;
+  }
+
+}
+
+[hidden] {
+  display: none !important;
+}
+
+/* Preserve help columns even while a previously printed response is resized. */
+
+.help-output {
+  white-space: pre;
+  overflow-x: auto;
+  max-width: 100%;
+}

@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Elevator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #1a1a1a;
+        }
+
+        .elevator-container {
+            width: 850px;
+            height: 900px;
+            background: #3a3a3a;
+            border: 15px solid #2a2a2a;
+            border-radius: 30px;
+            position: relative;
+            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.8), inset 0 0 50px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Top Trim */
+        .elevator-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 30px;
+            background: linear-gradient(180deg, #555 0%, #333 100%);
+            border-bottom: 2px solid #111;
+            z-index: 100;
+        }
+
+        /* Direction Indicator */
+        .direction-indicator {
+            background: linear-gradient(180deg, #444 0%, #2a2a2a 100%);
+            padding: 25px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 50px;
+            border-bottom: 3px solid #555;
+            margin-top: 30px;
+        }
+
+        .arrow-light {
+            width: 70px;
+            height: 70px;
+            background: #1a1a1a;
+            border: 4px solid #555;
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 45px;
+            color: #444;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8), 0 4px 10px rgba(0, 0, 0, 0.6);
+        }
+
+        .arrow-light.active {
+            background: #ffff00;
+            color: #000;
+            border-color: #ffff00;
+            box-shadow: 0 0 30px rgba(255, 255, 0, 0.9), inset 0 0 15px rgba(0, 0, 0, 0.2);
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Main Elevator Space */
+        .elevator-main {
+            flex: 1;
+            display: flex;
+            position: relative;
+            gap: 20px;
+            padding: 20px;
+            background:
+                repeating-linear-gradient(90deg, rgba(255,255,255,0.025) 0 1px, transparent 1px 5px),
+                linear-gradient(110deg, #45494b 0%, #232628 35%, #4b4f51 68%, #202325 100%);
+            align-items: center;
+        }
+
+        /* Floor Panel */
+        .controls-column {
+            width: 140px;
+            min-width: 140px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .floor-panel {
+            background:
+                linear-gradient(115deg, rgba(255,255,255,0.18), transparent 24% 68%, rgba(255,255,255,0.08)),
+                repeating-linear-gradient(90deg, #34383a 0 2px, #2a2d2f 2px 4px);
+            padding: 15px;
+            border: 3px solid #555;
+            border-radius: 15px;
+            display: grid;
+            grid-template-columns: repeat(2, 45px);
+            grid-template-rows: repeat(4, 1fr);
+            gap: 8px;
+            align-items: center;
+            justify-items: center;
+            justify-content: center;
+            width: 140px;
+            min-width: 140px;
+            height: fit-content;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8), 0 4px 10px rgba(0, 0, 0, 0.6);
+        }
+
+        .floor-button {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #444 0%, #222 100%);
+            border: 3px solid #666;
+            color: #999;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.7), 0 5px 12px rgba(0, 0, 0, 0.6);
+            position: relative;
+        }
+
+        .floor-button:hover {
+            background: linear-gradient(135deg, #555 0%, #333 100%);
+            border-color: #888;
+            transform: scale(1.05);
+        }
+
+        .floor-button.active {
+            background: linear-gradient(135deg, #ffff00 0%, #ffcc00 100%);
+            color: #000;
+            border-color: #ffff99;
+            box-shadow: 0 0 20px rgba(255, 255, 0, 0.9), inset 0 0 15px rgba(0, 0, 0, 0.2);
+            text-shadow: 0 0 3px rgba(0, 0, 0, 0.4);
+        }
+
+        .floor-button.furnace-call {
+            animation: furnace-call 0.8s ease-in-out infinite alternate;
+        }
+
+        @keyframes furnace-call {
+            from {
+                border-color: #8a4b21;
+                box-shadow: 0 0 5px rgba(255, 82, 20, 0.25), inset 0 0 15px rgba(0, 0, 0, 0.7);
+            }
+            to {
+                border-color: #ffd18a;
+                color: #fff3d5;
+                background: linear-gradient(135deg, #9e351b 0%, #35130d 100%);
+                box-shadow: 0 0 24px rgba(255, 91, 25, 0.95), inset 0 0 10px rgba(255, 190, 90, 0.35);
+            }
+        }
+
+        .floor-button.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .inventory-slot {
+            width: 72px;
+            height: 72px;
+            display: grid;
+            place-items: center;
+            position: relative;
+            background: #101213;
+            border: 3px solid #606568;
+            box-shadow: inset 0 0 18px #000, 0 4px 10px rgba(0,0,0,0.65);
+            color: transparent;
+            font-size: 34px;
+        }
+
+        .inventory-slot::after {
+            content: 'ITEM';
+            position: absolute;
+            bottom: 3px;
+            color: #666;
+            font-size: 8px;
+            letter-spacing: 0.16em;
+        }
+
+        .inventory-slot.has-key {
+            color: #d3a74f;
+            border-color: #a88038;
+            text-shadow: 0 0 9px rgba(255, 190, 70, 0.5);
+        }
+
+        .inventory-slot.has-key::after { content: 'IRON KEY'; color: #b99451; }
+        .inventory-slot.using-key { animation: key-turn 0.7s ease-in-out; }
+
+        .key-pickup,
+        .door-hotspot,
+        .furnace-hotspot {
+            position: absolute;
+            z-index: 5;
+            border: 0;
+            cursor: pointer;
+        }
+
+        .key-pickup {
+            left: 48%;
+            bottom: 12%;
+            width: 72px;
+            height: 72px;
+            padding: 0;
+            appearance: none;
+            -webkit-appearance: none;
+            background: transparent !important;
+            border-radius: 50%;
+            outline: none;
+            box-shadow: none;
+            -webkit-tap-highlight-color: transparent;
+            color: #c49a49;
+            font-size: 48px;
+            transform: rotate(-18deg);
+            filter: drop-shadow(0 0 7px rgba(255, 199, 86, 0.6));
+            animation: key-hover 2.2s ease-in-out infinite;
+        }
+
+        .key-pickup:hover { filter: drop-shadow(0 0 13px rgba(255, 214, 120, 0.95)); }
+
+        .key-pickup:focus-visible {
+            outline: 2px solid rgba(255, 214, 120, 0.8);
+            outline-offset: 4px;
+        }
+
+        .door-hotspot {
+            inset: 5% 12%;
+            background: transparent;
+            border-radius: 42% 42% 3% 3%;
+        }
+
+        .door-hotspot:hover {
+            box-shadow: inset 0 0 25px rgba(224, 169, 76, 0.16);
+        }
+
+        .key-pickup[hidden], .door-hotspot[hidden] { display: none; }
+
+        .furnace-hotspot {
+            left: 34%;
+            top: 35%;
+            width: 32%;
+            height: 34%;
+            background: transparent;
+            border-radius: 48%;
+        }
+
+        .furnace-hotspot:hover {
+            box-shadow: 0 0 24px rgba(175, 190, 195, 0.22), inset 0 0 20px rgba(190, 205, 210, 0.12);
+        }
+
+        .furnace-hotspot[hidden] { display: none; }
+
+        @keyframes key-hover {
+            0%, 100% { transform: translateY(0) rotate(-18deg); }
+            50% { transform: translateY(-5px) rotate(-15deg); }
+        }
+
+        @keyframes key-turn {
+            0% { transform: rotate(0); }
+            50% { transform: rotate(35deg) scale(1.08); }
+            100% { transform: rotate(0); }
+        }
+
+        /* Doors and Floor Content Container */
+        .doors-container {
+            flex: 1;
+            align-self: stretch;
+            min-height: 0;
+            display: flex;
+            position: relative;
+            overflow: hidden;
+            isolation: isolate;
+            background: #202020;
+            border-radius: 15px;
+            box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Elevator Cabin Walls */
+        .elevator-cabin {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+            z-index: 5;
+        }
+
+        .cabin-ceiling {
+            height: 34px;
+            background:
+                linear-gradient(90deg, rgba(255,255,255,0.05), rgba(255,255,255,0.5) 50%, rgba(255,255,255,0.05)),
+                linear-gradient(180deg, #777b7d 0%, #363a3c 100%);
+            border-bottom: 2px solid #333;
+        }
+
+        .cabin-walls {
+            flex: 1;
+            display: flex;
+            gap: 20px;
+            padding: 20px;
+            background-size: auto 100%;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-color: #080909;
+            border-left: 3px solid #777;
+            border-right: 3px solid #777;
+            position: relative;
+            overflow: hidden;
+            clip-path: inset(0);
+            z-index: 10;
+        }
+
+        /* Floor 2: gently displace only the distant end of the hallway. */
+        .cabin-walls.hallway-sway::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: inherit;
+            background-size: inherit;
+            background-position: inherit;
+            background-repeat: inherit;
+            pointer-events: none;
+            transform-origin: 50% 42%;
+            -webkit-mask-image: radial-gradient(
+                ellipse 18% 25% at 50% 42%,
+                #000 0%,
+                rgba(0, 0, 0, 0.9) 35%,
+                transparent 100%
+            );
+            mask-image: radial-gradient(
+                ellipse 18% 25% at 50% 42%,
+                #000 0%,
+                rgba(0, 0, 0, 0.9) 35%,
+                transparent 100%
+            );
+            animation: hallway-drift 5s ease-in-out infinite alternate;
+            will-change: transform, filter;
+            z-index: 1;
+        }
+
+        /* The cabin itself becomes less mechanical as the ascent continues. */
+        .elevator-container.life-stage-4 .cabin-walls,
+        .elevator-container.life-stage-7 .cabin-walls {
+            animation: room-breath 5.5s ease-in-out infinite;
+        }
+
+        .elevator-container.life-stage-5 .cabin-walls {
+            animation: heart-room 1.8s ease-in-out infinite;
+        }
+
+        .elevator-container.life-stage-6:not(.awakened) .doors-open .cabin-walls {
+            animation: garden-reach 7s ease-in-out infinite alternate;
+        }
+
+        /* Once floor 8 is reached, familiar floors become unstable. */
+        .elevator-container.awakened .cabin-walls {
+            background-size: auto 100%;
+            background-position: center;
+            filter: none;
+        }
+
+        .elevator-container.awakened .cabin-walls.final-field {
+            background-position: center;
+            filter: none;
+        }
+
+        .elevator-container.awakened .cabin-walls.final-field::before {
+            display: none;
+        }
+
+        .elevator-container.awakened .doors-container {
+            box-shadow:
+                0 0 14px rgba(105, 10, 20, 0.34),
+                inset 0 0 18px rgba(105, 10, 20, 0.18);
+        }
+
+        @keyframes room-breath {
+            0%, 100% { filter: brightness(0.92); }
+            50% { filter: brightness(1.04); }
+        }
+
+        @keyframes heart-room {
+            0%, 38%, 100% { filter: brightness(0.85); }
+            44% { filter: brightness(1.08); }
+            55% { filter: brightness(0.92); }
+            61% { filter: brightness(1.03); }
+        }
+
+        @keyframes garden-reach {
+            from { transform: translateX(-2px); filter: saturate(0.95); }
+            to { transform: translateX(2px); filter: saturate(1.12); }
+        }
+
+        @keyframes hallway-drift {
+            0% {
+                transform: translateX(-5px) rotate(-0.35deg) scale(1.012);
+                filter: brightness(0.92) blur(0.3px);
+            }
+            100% {
+                transform: translateX(5px) rotate(0.35deg) scale(1.012);
+                filter: brightness(0.82) blur(0.6px);
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .cabin-walls.hallway-sway::after,
+            .elevator-container .cabin-walls {
+                animation: none;
+            }
+
+            .floor-button.furnace-call { animation: none; }
+        }
+
+        .cabin-floor {
+            height: 40px;
+            background: linear-gradient(90deg, #414547 0%, #a5a9aa 50%, #414547 100%);
+            border-top: 3px solid #444;
+            border-left: 3px solid #777;
+            border-right: 3px solid #777;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .floor-status {
+            font-size: 12px;
+            color: #17191a;
+            font-weight: bold;
+            text-shadow: 0 1px rgba(255,255,255,0.4);
+        }
+
+        /* Doors */
+        .door {
+            width: 50%;
+            position: absolute;
+            top: 34px;
+            bottom: 40px;
+            transition: transform 0.45s cubic-bezier(0.65, 0, 0.35, 1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 2px solid #45494b;
+            box-shadow: inset 0 0 28px rgba(0, 0, 0, 0.34), 0 0 12px rgba(0, 0, 0, 0.7);
+            z-index: 30;
+        }
+
+        /* A broad reflected highlight gives the steel a polished finish. */
+        .door::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(105deg, transparent 12%, rgba(255,255,255,0.07) 30%, rgba(255,255,255,0.5) 45%, rgba(255,255,255,0.08) 58%, transparent 76%);
+            opacity: 0.75;
+            pointer-events: none;
+        }
+
+        /* A dark seam and brushed-metal lines make the two panels read as doors. */
+        .door::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(
+                90deg,
+                transparent 0,
+                transparent 38px,
+                rgba(255, 255, 255, 0.07) 39px,
+                rgba(0, 0, 0, 0.08) 40px
+            );
+            pointer-events: none;
+        }
+
+        .door-left {
+            left: 0;
+            transform: translateX(0);
+            border-right: 1px solid #666;
+            background:
+                repeating-linear-gradient(90deg, rgba(255,255,255,0.04) 0 1px, rgba(0,0,0,0.025) 1px 3px),
+                linear-gradient(90deg, #555b5e 0%, #b9bec0 35%, #858b8e 72%, #4b5052 100%);
+            box-shadow: inset -8px 0 15px rgba(0,0,0,0.48), inset 8px 0 18px rgba(255,255,255,0.16);
+        }
+
+        .door-right {
+            right: 0;
+            transform: translateX(0);
+            border-left: 1px solid #666;
+            background:
+                repeating-linear-gradient(90deg, rgba(255,255,255,0.04) 0 1px, rgba(0,0,0,0.025) 1px 3px),
+                linear-gradient(90deg, #4b5052 0%, #858b8e 28%, #b9bec0 65%, #555b5e 100%);
+            box-shadow: inset 8px 0 15px rgba(0,0,0,0.48), inset -8px 0 18px rgba(255,255,255,0.16);
+        }
+
+        .doors-container.doors-open .door-left {
+            transform: translateX(-100%);
+        }
+
+        .doors-container.doors-open .door-right {
+            transform: translateX(100%);
+        }
+
+        /* Floor Content */
+        .floor-content {
+            display: none;
+        }
+
+        .floor-label {
+            display: none;
+        }
+
+        .floor-theme {
+            display: none;
+        }
+
+        .floor-info {
+            display: none;
+        }
+
+        /* Floor specific styles */
+        .floor-1 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .floor-2 {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .floor-3 {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .floor-4 {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+
+        .floor-5 {
+            background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
+        }
+
+        .floor-6 {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        }
+
+        .floor-7 {
+            background: linear-gradient(135deg, #ff9a56 0%, #ff6a88 100%);
+        }
+
+        .floor-8 {
+            background: linear-gradient(135deg, #2e2e78 0%, #662d8c 100%);
+        }
+    </style>
+</head>
+<body>
+    <div class="elevator-container">
+        <!-- Direction Indicator -->
+        <div class="direction-indicator">
+            <div class="arrow-light" id="arrow-up">↑</div>
+            <div class="arrow-light" id="arrow-down">↓</div>
+        </div>
+
+        <!-- Main Elevator Space -->
+        <div class="elevator-main">
+            <!-- Floor Panel and Inventory -->
+            <div class="controls-column">
+                <div class="floor-panel">
+                    <button class="floor-button" data-floor="8">8</button>
+                    <button class="floor-button" data-floor="7">7</button>
+                    <button class="floor-button" data-floor="6">6</button>
+                    <button class="floor-button" data-floor="5">5</button>
+                    <button class="floor-button" data-floor="4">4</button>
+                    <button class="floor-button" data-floor="3">3</button>
+                    <button class="floor-button" data-floor="2">2</button>
+                    <button class="floor-button" data-floor="1">1</button>
+                </div>
+                <div class="inventory-slot" id="inventory-slot" aria-label="Empty inventory slot">🗝️</div>
+            </div>
+
+            <!-- Doors and Floor Content -->
+            <div class="doors-container" aria-live="polite">
+                <!-- Elevator Cabin -->
+                <div class="elevator-cabin">
+                    <!-- Ceiling -->
+                    <div class="cabin-ceiling"></div>
+
+                    <!-- Walls and Floor Content -->
+                    <div class="cabin-walls">
+                        <button class="key-pickup" id="key-pickup" aria-label="Pick up the iron key" hidden>🗝️</button>
+                        <button class="door-hotspot" id="door-hotspot" aria-label="Unlock the wooden door" hidden></button>
+                        <button class="furnace-hotspot" id="furnace-hotspot" aria-label="Relight the dormant furnace" hidden></button>
+                    </div>
+
+                    <!-- Doors on top of content -->
+                    <div class="door door-left"></div>
+                    <div class="door door-right"></div>
+
+                    <!-- Floor -->
+                    <div class="cabin-floor">
+                        <div class="floor-status" id="floor-status">Current Floor: 1</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Floor themes
+        // To add custom images:
+        // 1. Download or create images for each floor
+        // 2. Save them to the 'img' folder with these filenames:
+        //    - floor1-lobby.jpg, floor2-office.jpg, etc.
+        // 3. The backgroundImage paths will automatically load them
+        const floorThemes = {
+            1: {
+                name: 'Lobby',
+                icon: '🏢',
+                backgroundImage: 'img/floor1-lobby.png',
+                awakenedImage: 'img/floor1-lobby-awakened.png'
+            },
+            2: {
+                name: 'The Hallway',
+                icon: '🚪',
+                backgroundImage: 'img/floor2-hallway.png',
+                awakenedImage: 'img/floor2-hallway-awakened.png'
+            },
+            3: {
+                name: 'Maintenance',
+                icon: '⚙️',
+                backgroundImage: 'img/floor3-maintenance.png',
+                awakenedImage: 'img/floor3-maintenance-awakened.png'
+            },
+            4: {
+                name: 'Dining Room',
+                icon: '🍽️',
+                backgroundImage: 'img/floor4-dining.png',
+                awakenedImage: 'img/floor4-dining-awakened.png'
+            },
+            5: {
+                name: 'Mechanical Heart',
+                icon: '♥',
+                backgroundImage: 'img/floor5-door-right.png',
+                awakenedImage: 'img/floor5-heart-awakened-right.png',
+                openedImage: 'img/floor5-furnace-unlit.png',
+                litImage: 'img/floor5-furnace-lit.png'
+            },
+            6: {
+                name: 'The Garden',
+                icon: '🌿',
+                backgroundImage: 'img/floor6-garden.png',
+                awakenedImage: 'img/floor6-garden-awakened.png'
+            },
+            7: {
+                name: 'The Chamber',
+                icon: '◇',
+                backgroundImage: 'img/floor7-chamber.png',
+                awakenedImage: 'img/floor7-chamber-awakened.png'
+            },
+            8: {
+                name: 'The Eyes',
+                icon: '👁',
+                backgroundImage: 'img/floor8-eyes.png'
+            }
+        };
+
+        let currentFloor = 1;
+        let isMoving = false;
+        let hasAwakened = false;
+        let hasKey = false;
+        let doorUnlocked = false;
+        let furnaceLit = false;
+        const doorAnimationTime = 450;
+
+        const floorButtons = document.querySelectorAll('.floor-button');
+        const elevatorContainer = document.querySelector('.elevator-container');
+        const doorsContainer = document.querySelector('.doors-container');
+        const cabinWalls = document.querySelector('.cabin-walls');
+        const floorLabel = document.getElementById('floor-label');
+        const floorTheme = document.getElementById('floor-theme');
+        const floorInfo = document.getElementById('floor-info');
+        const floorStatus = document.getElementById('floor-status');
+        const keyPickup = document.getElementById('key-pickup');
+        const doorHotspot = document.getElementById('door-hotspot');
+        const furnaceHotspot = document.getElementById('furnace-hotspot');
+        const inventorySlot = document.getElementById('inventory-slot');
+        const arrowUp = document.getElementById('arrow-up');
+        const arrowDown = document.getElementById('arrow-down');
+
+        // Always begin a new visit on floor 1, even when the browser restores the page.
+        resetElevator();
+        window.addEventListener('pageshow', resetElevator);
+
+        floorButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const targetFloor = parseInt(button.dataset.floor);
+                if (targetFloor !== currentFloor && !isMoving) {
+                    moveElevator(targetFloor);
+                } else if (targetFloor === currentFloor && !isMoving) {
+                    openDoors();
+                }
+            });
+        });
+
+        keyPickup.addEventListener('click', () => {
+            hasKey = true;
+            floorStatus.textContent = 'You picked up an old iron key.';
+            updateInteractiveItems();
+        });
+
+        doorHotspot.addEventListener('click', () => {
+            if (!hasKey) {
+                floorStatus.textContent = 'The lock requires an old iron key.';
+                return;
+            }
+
+            isMoving = true;
+            floorButtons.forEach(btn => btn.disabled = true);
+            inventorySlot.classList.add('using-key');
+            floorStatus.textContent = 'The key turns inside the lock…';
+
+            setTimeout(() => {
+                doorUnlocked = true;
+                isMoving = false;
+                floorButtons.forEach(btn => btn.disabled = false);
+                inventorySlot.classList.remove('using-key');
+                updateFloorDisplay();
+                floorStatus.textContent = 'The door is open.';
+            }, 700);
+        });
+
+        furnaceHotspot.addEventListener('click', () => {
+            if (furnaceLit) return;
+
+            furnaceLit = true;
+            updateFloorDisplay();
+            floorStatus.textContent = 'The furnace wakes. Floor 1 is calling.';
+        });
+
+        function moveElevator(targetFloor) {
+            isMoving = true;
+            const direction = targetFloor > currentFloor ? 'up' : 'down';
+
+            // Disable all buttons
+            floorButtons.forEach(btn => btn.disabled = true);
+
+            // Close doors
+            doorsContainer.classList.remove('doors-open');
+
+            // Wait until the doors have fully closed before the elevator moves.
+            setTimeout(() => {
+                const hesitation = targetFloor >= 6 ? 250 : 0;
+                if (hesitation) {
+                    floorStatus.textContent = 'The elevator is listening…';
+                }
+
+                setTimeout(() => {
+                    updateDirectionIndicator(direction);
+
+                    // Keep a sense of distance without making longer trips drag.
+                    const travelTime = Math.abs(targetFloor - currentFloor) * 350;
+
+                    setTimeout(() => {
+                        currentFloor = targetFloor;
+                        updateFloorDisplay();
+                        disableArrows();
+                        openDoors();
+
+                        // Re-enable buttons once the new floor is revealed.
+                        setTimeout(() => {
+                            isMoving = false;
+                            floorButtons.forEach(btn => btn.disabled = false);
+                        }, doorAnimationTime);
+                    }, travelTime);
+                }, hesitation);
+            }, doorAnimationTime);
+        }
+
+        function updateDirectionIndicator(direction) {
+            arrowUp.classList.remove('active');
+            arrowDown.classList.remove('active');
+
+            if (direction === 'up') {
+                arrowUp.classList.add('active');
+            } else if (direction === 'down') {
+                arrowDown.classList.add('active');
+            }
+        }
+
+        function disableArrows() {
+            arrowUp.classList.remove('active');
+            arrowDown.classList.remove('active');
+        }
+
+        function openDoors() {
+            doorsContainer.classList.add('doors-open');
+        }
+
+        function resetElevator() {
+            currentFloor = 1;
+            isMoving = false;
+            hasAwakened = false;
+            hasKey = false;
+            doorUnlocked = false;
+            furnaceLit = false;
+
+            doorsContainer.classList.remove('doors-open');
+            elevatorContainer.classList.remove('awakened');
+            cabinWalls.removeAttribute('style');
+            disableArrows();
+
+            floorButtons.forEach(btn => {
+                btn.disabled = false;
+                btn.textContent = btn.dataset.floor;
+            });
+
+            updateFloorDisplay();
+        }
+
+        function updateFloorDisplay() {
+            const theme = floorThemes[currentFloor];
+
+            if (currentFloor === 8) {
+                hasAwakened = true;
+            }
+
+            elevatorContainer.classList.toggle('awakened', hasAwakened);
+
+            // Update status
+            floorStatus.textContent = `Current Floor: ${currentFloor}`;
+
+            // Some floors reveal a physically altered version after the awakening.
+            let activeImage = theme.backgroundImage;
+            if (hasAwakened && theme.awakenedImage) activeImage = theme.awakenedImage;
+            if (currentFloor === 5 && doorUnlocked && theme.openedImage) activeImage = theme.openedImage;
+            if (currentFloor === 5 && furnaceLit && theme.litImage) activeImage = theme.litImage;
+            if (currentFloor === 1 && furnaceLit) activeImage = 'img/ending-field.png';
+
+            if (activeImage) {
+                cabinWalls.style.backgroundImage = `url('${activeImage}')`;
+            } else {
+                cabinWalls.style.backgroundImage = 'none';
+            }
+
+            // The distant hallway subtly shifts while the foreground stays still.
+            cabinWalls.classList.toggle('hallway-sway', currentFloor === 2);
+            cabinWalls.classList.toggle('final-field', currentFloor === 1 && furnaceLit);
+
+            // Each floor changes the character of the elevator cabin.
+            for (let floor = 1; floor <= 8; floor++) {
+                elevatorContainer.classList.remove(`life-stage-${floor}`);
+            }
+            elevatorContainer.classList.add(`life-stage-${currentFloor}`);
+
+            // After the awakening, the building no longer uses human floor numbers.
+            floorButtons.forEach(btn => {
+                btn.textContent = hasAwakened
+                    ? floorThemes[parseInt(btn.dataset.floor)].icon
+                    : btn.dataset.floor;
+            });
+
+            // Update button states
+            floorButtons.forEach(btn => {
+                const buttonFloor = parseInt(btn.dataset.floor);
+                if (parseInt(btn.dataset.floor) === currentFloor) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+                btn.classList.toggle('furnace-call', furnaceLit && currentFloor !== 1 && buttonFloor === 1);
+            });
+
+            updateInteractiveItems();
+        }
+
+        function updateInteractiveItems() {
+            const keyIsAvailable = hasAwakened && currentFloor === 1 && !hasKey;
+            const lockedDoorIsVisible = hasAwakened && currentFloor === 5 && !doorUnlocked;
+            const dormantFurnaceIsVisible = hasAwakened && currentFloor === 5 && doorUnlocked && !furnaceLit;
+
+            keyPickup.hidden = !keyIsAvailable;
+            doorHotspot.hidden = !lockedDoorIsVisible;
+            furnaceHotspot.hidden = !dormantFurnaceIsVisible;
+            inventorySlot.classList.toggle('has-key', hasKey);
+            inventorySlot.setAttribute(
+                'aria-label',
+                hasKey ? 'Inventory: old iron key' : 'Empty inventory slot'
+            );
+        }
+    </script>
+</body>
+</html>
