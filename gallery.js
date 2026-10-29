@@ -9,7 +9,7 @@ let target=0,angle=0,radius=800,width=1100,height=600,last=0,hover=0,hoverAt=0,a
 const reduced=matchMedia('(prefers-reduced-motion: reduce)');
 const panels=projects.map((p,i)=>{
  const panel=document.createElement('section');panel.className='panel';panel.setAttribute('aria-label',p.short);
- panel.innerHTML=`<div class="panel-label"><span>${String(i+1).padStart(2,'0')} — ${p.short.toUpperCase()}</span><span>INTERACTIVE WEB EXPERIMENT</span></div><div class="screen"><iframe title="${p.short} — interactive project" src="${p.url}" allow="fullscreen" tabindex="-1"></iframe><button class="expand-project" aria-label="Open ${p.short} fullscreen"></button></div>`;
+ panel.innerHTML=`<div class="panel-label"><span>${String(i+1).padStart(2,'0')} — ${p.short.toUpperCase()}</span><span>INTERACTIVE WEB EXPERIMENT</span></div><div class="screen"><iframe title="${p.short} — interactive project" data-src="${p.url}" allow="fullscreen" tabindex="-1"></iframe><button class="expand-project" aria-label="Open ${p.short} fullscreen"></button></div>`;
  world.append(panel);panel.querySelector('.expand-project').onclick=()=>openProject(i);
  const b=document.createElement('button');b.innerHTML=`<span>${String(i+1).padStart(2,'0')}</span>${p.short}`;b.onclick=()=>go(i);$('#index').append(b);
  return panel;
@@ -32,8 +32,10 @@ function draw(){panels.forEach((p,i)=>{const a=mod(i*90-angle+180,360)-180,rad=a
 function tick(t){if(fullscreen){animation=0;return;}const dt=Math.min(t-last||16,40);last=t;if(hover&&t-hoverAt>650&&Math.abs(target-angle)<.3){step(hover);hoverAt=t;}angle=reduced.matches?target:angle+(target-angle)*(1-Math.exp(-dt/190));if(Math.abs(angle-target)<.01)angle=target;draw();animation=requestAnimationFrame(tick);}
 for(const [s,dir] of [['.top',-1],['.bottom',1]]){const el=$(s);el.addEventListener('pointerenter',e=>{if(e.pointerType==='mouse'&&!reduced.matches){hover=dir;hoverAt=performance.now();}});el.addEventListener('pointerleave',()=>hover=0);el.addEventListener('click',()=>{step(dir);hoverAt=performance.now()+400;});}
 window.addEventListener('blur',()=>hover=0);document.addEventListener('visibilitychange',()=>hover=0);window.addEventListener('resize',resize);
-document.addEventListener('keydown',e=>{if(fullscreen){if(e.key==='Escape')closeProject();return;}if(e.key==='Escape')setHelp(false);if(e.key==='ArrowUp'||e.key==='ArrowDown'){e.preventDefault();step(e.key==='ArrowUp'?-1:1);}});
+document.addEventListener('keydown',e=>{if(!$('#intro').hidden||$('#about-dialog').open)return;if(fullscreen){if(e.key==='Escape')closeProject();return;}if(e.key==='Escape')setHelp(false);if(e.key==='ArrowUp'||e.key==='ArrowDown'){e.preventDefault();step(e.key==='ArrowUp'?-1:1);}});
 function setHelp(open){$('#instructions').hidden=!open;$('#help').setAttribute('aria-expanded',String(open));if(open)$('#closeHelp').focus();else $('#help').focus();}
 $('#help').onclick=()=>setHelp($('#instructions').hidden);$('#closeHelp').onclick=()=>setHelp(false);
 let touchStart=0;$('#swipe').addEventListener('touchstart',e=>touchStart=e.changedTouches[0].clientY,{passive:true});$('#swipe').addEventListener('touchend',e=>{const d=e.changedTouches[0].clientY-touchStart;if(Math.abs(d)>45)step(d<0?1:-1)},{passive:true});
-function readHash(){const i=projects.findIndex(p=>p.id===location.hash.slice(1));if(i>=0)go(i);}readHash();angle=target;window.addEventListener('hashchange',readHash);resize();animation=requestAnimationFrame(tick);
+function readHash(){const i=projects.findIndex(p=>p.id===location.hash.slice(1));if(i>=0)go(i);}readHash();angle=target;window.addEventListener('hashchange',readHash);resize();
+window.addEventListener('portfolio:load',()=>panels.forEach(p=>{const f=p.querySelector('iframe');f.src=f.dataset.src;}),{once:true});
+window.addEventListener('portfolio:enter',()=>{last=performance.now();animation=requestAnimationFrame(tick);},{once:true});

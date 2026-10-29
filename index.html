@@ -1,7 +1,12 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#171916"><meta name="description" content="Four interactive worlds by Winston Kim. A portfolio experienced from inside a circular gallery."><title>Winston Kim — Inside the Web</title><link rel="stylesheet" href="gallery.css?v=vertical-gallery-7"><script src="gallery.js?v=vertical-gallery-7" defer></script></head>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#171916"><meta name="description" content="Four interactive worlds by Winston Kim. A portfolio experienced from inside a circular gallery."><title>Winston Kim — Inside the Web</title><link rel="stylesheet" href="gallery.css?v=cloud-about-8"><script src="gallery.js?v=cloud-about-8" defer></script><link rel="stylesheet" href="intro.css?v=cloud-about-8"><script src="intro.js?v=cloud-about-8" defer></script></head>
 <body>
-<header><a class="identity" href="#page00">WINSTON KIM<span>ART 101 · SELECTED WEB WORK</span></a><div class="edition">INSIDE THE WEB <span>↗</span></div><button id="help" aria-expanded="false" aria-controls="instructions">How to explore <span>?</span></button></header>
+<section id="intro" role="dialog" aria-modal="true" aria-label="Welcome to Winston Kim’s portfolio">
+ <div class="intro-coordinate">WINSTON KIM / SELECTED WORK</div><div class="intro-edition">ART 101</div>
+ <div class="cloud-stage"><img class="cloud-layer haze" src="assets/cloud.svg" alt="" aria-hidden="true"><img class="cloud-layer main" src="assets/cloud.svg" alt="A soft, luminous cloud"><img class="cloud-layer wisp" src="assets/cloud.svg" alt="" aria-hidden="true"><button id="enter-portfolio"><strong>Winston Kim</strong><span>Click the cloud to enter ↗</span></button></div>
+ <div class="intro-caption">SOMEWHERE BETWEEN THE FAMILIAR<br>AND THE STRANGE</div>
+</section>
+<header><a class="identity" href="#page00">WINSTON KIM<span>ART 101 · SELECTED WEB WORK</span></a><div class="edition">INSIDE THE WEB <span>↗</span></div><div class="header-actions"><button id="about-button" aria-haspopup="dialog" aria-controls="about-dialog">About me</button><button id="help" aria-expanded="false" aria-controls="instructions">How to explore <span>?</span></button></div></header>
 <main id="gallery" aria-label="Circular portfolio gallery">
 <div class="ceiling" aria-hidden="true"><div></div><div></div><div></div></div><div class="floor" aria-hidden="true"><div></div><div></div><div></div></div>
 <div id="scene"><div id="world"></div></div>
@@ -10,5 +15,11 @@
 </main>
 <aside id="instructions" hidden><button id="closeHelp" aria-label="Close instructions">×</button><span class="eyebrow">A PORTFOLIO IN THE ROUND</span><h1>Four worlds.<br>One continuous space.</h1><p>You’re standing in the center. Move your mouse to the top or bottom edge of the gallery and hold it there to turn around the gallery.</p><p>Click any website to open it fullscreen. Use “Back to portfolio” to return to the gallery. Use the project names or arrow buttons to jump between works. On a phone, swipe up or down on the project information below.</p><p class="muted">Keyboard: focus the gallery controls and use ↑ / ↓. Project keyboards remain independent.</p></aside>
 <footer><div class="project-info" id="swipe"><span class="eyebrow" id="category"></span><div class="project-heading"><h1 id="title"></h1><a id="open" target="_blank" rel="noopener" aria-label="Open current project in a new tab">↗</a></div><p id="description"></p></div><div class="navigation"><div class="nav-caption"><span>MOVE UP OR DOWN TO EXPLORE</span><span id="counter">01 / 04</span></div><nav aria-label="Projects" id="index"></nav><div id="versions" hidden><span>Explore versions</span> <a href="projects/intime/terminal/index.html" target="_blank" rel="noopener">Terminal ↗</a><a href="projects/intime/lifeline/index.html" target="_blank" rel="noopener">Lifeline ↗</a></div></div></footer>
+<dialog id="about-dialog" aria-labelledby="about-title">
+<button id="close-about" type="button" autofocus>Close ×</button>
+<span class="eyebrow">ABOUT ME</span><h1 id="about-title">Winston Kim.</h1><div class="about-course">MUSIC TECH / ART 101</div>
+<div class="about-copy"><p>My name is Winston Kim and I am a Music Tech major. My creative interests lean towards nostalgic/surreal, and slightly dystopian. I like experimenting with ideas that feel familiar in the beginning but become more strange the longer you interact with them.</p>
+<p>I'm interested in how technology influences our perception of reality, time, and memory. I'm drawn to the contrast between old and new, where the imperfections of analog coincide with the idea of speculative future that has a feeling of nostalgia. I don't necessarily want everything I create to have some big meaning but sometimes just want to create things that are weird and see where it goes.</p></div>
+</dialog>
 <div id="announcement" class="sr-only" aria-live="polite"></div>
 </body></html>

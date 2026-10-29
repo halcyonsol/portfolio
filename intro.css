@@ -1,0 +1,29 @@
+#intro{position:fixed;inset:0;z-index:200;display:grid;place-items:center;overflow:hidden;background:radial-gradient(ellipse at 50% 44%,#465347 0%,#28352e 43%,#111b17 100%);transition:background-color 1.2s,opacity .65s .7s}
+#intro[hidden]{display:none}
+#intro::before{content:"";position:absolute;inset:0;opacity:.15;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Cpath fill='%23fff' filter='url(%23n)' d='M0 0h180v180H0z' opacity='.4'/%3E%3C/svg%3E");pointer-events:none}
+.intro-coordinate{position:absolute;top:38px;left:40px;color:#b6c1b3;font:10px monospace;letter-spacing:.15em}
+.intro-edition{position:absolute;top:38px;right:40px;color:#b6c1b3;font:10px monospace;letter-spacing:.15em}
+.cloud-stage{position:relative;width:min(1000px,110vw);aspect-ratio:5/3;isolation:isolate}
+.cloud-layer{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;pointer-events:none;user-select:none;transition:transform 1.5s cubic-bezier(.2,.6,.25,1),opacity 1.2s}
+.cloud-layer.haze{opacity:.23;transform:translate(-3%,4%) scale(1.12)}
+.cloud-layer.wisp{opacity:.16;transform:translate(4%,5%) scale(1.06)}
+#enter-portfolio{position:absolute;left:50%;top:50%;transform:translate(-50%,-30%);width:45%;min-height:100px;padding:15px;border:0;background:transparent;color:#263b30;text-align:center;cursor:pointer;transition:opacity .35s,transform .5s}
+#enter-portfolio strong{display:block;font:normal clamp(31px,4.5vw,54px)/1.15 Georgia,serif;letter-spacing:-.055em;text-shadow:0 1px 16px #fffff077}
+#enter-portfolio span{display:block;margin-top:15px;font:9px monospace;letter-spacing:.2em;text-transform:uppercase}
+#enter-portfolio:hover span{letter-spacing:.25em}#enter-portfolio:focus-visible{outline:1px solid #3e5947;outline-offset:5px;border-radius:50%}
+.intro-caption{position:absolute;bottom:42px;left:0;right:0;text-align:center;color:#a8b8a6;font:9px monospace;letter-spacing:.2em;line-height:2}
+#intro.dissipating{opacity:0;pointer-events:none}
+.dissipating .cloud-layer.main{transform:translate(-13%,-15%) scale(1.7);opacity:0}
+.dissipating .cloud-layer.haze{transform:translate(-40%,7%) scale(2);opacity:0}
+.dissipating .cloud-layer.wisp{transform:translate(40%,-6%) scale(2.2);opacity:0}
+.dissipating #enter-portfolio{opacity:0;transform:translate(-50%,-50%)}
+.header-actions{display:flex;align-items:center;gap:24px}#about-button{border:0;background:none;color:#b9bcb0;font:11px Arial,sans-serif;padding:8px 0}
+#about-dialog{color:#263129;background:#e8e7dd;width:min(720px,calc(100vw - 32px));max-height:calc(100dvh - 40px);border:1px solid #9ba48f;border-radius:3px;padding:60px;box-shadow:0 24px 100px #0007}
+#about-dialog::backdrop{background:#111811df}
+#about-dialog .eyebrow{color:#687460}#about-title{font:normal clamp(38px,6vw,62px)/1.05 Georgia,serif;letter-spacing:-.04em;margin:20px 0 10px}
+.about-course{font:10px monospace;letter-spacing:.16em;color:#6d7966;margin-bottom:32px}
+.about-copy{border-top:1px solid #aab09f;padding-top:12px}.about-copy p{font:16px/1.8 Arial,sans-serif;margin:18px 0 0}
+#close-about{position:absolute;right:18px;top:14px;padding:8px;border:0;background:none;color:#3b493b;font:12px Arial,sans-serif}
+#close-about:focus-visible{outline:2px solid #495d3d}
+@media(max-width:700px){.intro-coordinate{top:24px;left:20px;font-size:8px}.intro-edition{top:24px;right:20px;font-size:8px}.cloud-stage{width:145vw}#enter-portfolio{width:50%;transform:translate(-50%,-35%)}#enter-portfolio span{font-size:8px}.intro-caption{bottom:28px;font-size:8px}.header-actions{gap:16px}#about-button{font-size:10px}#help{font-size:10px}#help span{margin-left:5px}#about-dialog{padding:42px 25px 28px}.about-copy p{font-size:14px;line-height:1.75}.about-course{font-size:9px;margin-bottom:23px}}
+@media(prefers-reduced-motion:reduce){#intro,#enter-portfolio,.cloud-layer{transition:none!important}.dissipating .cloud-layer{transform:none!important}}
